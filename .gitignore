@@ -1,0 +1,15 @@
+__pycache__
+Include
+Lib
+Scripts
+
+*.ini
+*.log
+*.json
+*.session
+*.zip
+lib64
+lib
+bin
+include
+pyvenv.cfg
