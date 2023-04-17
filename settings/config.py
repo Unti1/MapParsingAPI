@@ -15,6 +15,7 @@ from selenium import webdriver
 """Прочие необходимые библиотеки"""
 import requests
 import datetime
+import traceback
 import configparser
 from threading import Thread
 import platform

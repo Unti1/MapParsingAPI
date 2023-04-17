@@ -14,7 +14,6 @@ class Parser():#Thread):
         self.wait = WebDriverWait(self.driver,15)
         self.action = ActionChains(self.driver,1)
         
-
     def browser_startUp(self, PROFILE_ID,invisable):
         """Создание настройка и создания эмуляции браузера
         """ 
