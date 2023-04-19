@@ -78,7 +78,7 @@ class Parser():#Thread):
         self.driver.get("https://yandex.ru/maps")
         time.sleep(1.5)
         
-    def ya_map(self,search_req,city):
+    def ya_map(self,search_req:str,city:str):
         """
         Сбор конкретно объявлений
         """
@@ -88,6 +88,8 @@ class Parser():#Thread):
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@class='input__control _bold']")))
         inp = self.driver.find_element(By.XPATH,"//input[@class='input__control _bold']")
         inp.click()
+        search_req = search_req.replace(" ","_")
+        city = city.replace(" ","_")
         self.action.send_keys(f"{search_req}_в_городе_{city}").perform()
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='popup _type_transparent _position_bottom _dropdown']")))
         inp.send_keys(Keys.ENTER)

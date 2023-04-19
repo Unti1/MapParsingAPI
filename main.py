@@ -48,49 +48,7 @@ def update_data():
 
 
 if __name__ == "__main__":
-    '''Блок тестов добавления и обновление данных в таблице '''
-    dat = ("image1", 
-           "title1", 
-           "page_link1", 
-           "coordinates1", 
-           "map_link1", 
-           "address1", 
-           "city1", 
-           4.5, 
-           "reviews1", 
-           "description1", 
-           "working_hours1", 
-           "social_links1", 
-           "website1", 
-           "phone_number1", 
-           "tags1")
-    db.insert_data(dat)
-    db.test_working()
-    
-    upt_dat = ("image1", 
-           "Название", 
-           "page_link1", 
-           "coordinates1", 
-           "map_link1", 
-           "address1", 
-           "city1", 
-           4.5, 
-           "reviews1", 
-           "description1", 
-           "working_hours1", 
-           "social_links1", 
-           "website1", 
-           "phone_number1", 
-           "tags1",
-           "time")
-    db.update_data(upt_dat)
-    db.test_working()
-    
-    
-
-    db._del_tab()
-
-    # Thread(target=auto_checking,args=()).start()
-    # app.run(host=config['server']['ip'], port=config['server']['port'])
-    # p.ya_map("Салоны красоты","Москва")
-    # print(p.ya_company_parsing(['https://yandex.ru/maps/-/CCUWv2v6sB']))
+    Thread(target=auto_checking,args=()).start()
+    app.run(host=config['server']['ip'], port=config['server']['port'])
+    p.ya_map("Салоны красоты","Москва")
+    print(p.ya_company_parsing(['https://yandex.ru/maps/-/CCUWv2v6sB']))
