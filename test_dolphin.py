@@ -30,3 +30,4 @@ if __name__ == "__main__":
     for data in parsing_data:
         print(data)
         print(len(data))
+    p.try_closing()
