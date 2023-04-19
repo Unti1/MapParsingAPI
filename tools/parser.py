@@ -88,11 +88,7 @@ class Parser():#Thread):
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@class='input__control _bold']")))
         inp = self.driver.find_element(By.XPATH,"//input[@class='input__control _bold']")
         inp.click()
-        for let in f"{search_req} в городе {city}":# на сервере по какой то причине пробел не передается как пробел, а передается как enter ('~')
-            if let != " ":
-                self.action.send_keys(let).perform()
-            else:
-                self.action.send_keys(Keys.SPACE).perform()
+        self.action.send_keys(f"{search_req}_в_городе_{city}").perform()
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='popup _type_transparent _position_bottom _dropdown']")))
         inp.send_keys(Keys.ENTER)
         self.wait.until(EC.element_to_be_clickable((By.XPATH,'//div[@data-object="search-list-item"]')))
