@@ -6,9 +6,10 @@ if __name__ == "__main__":
     db = SQL_DB()
     try:
         db._del_tab()
+        db.create_table_if_not_exists()
     except:
+        db.create_table_if_not_exists()
         pass
-    
     print("Добавление элемента:")
     try:
         dat = ("image1", 
