@@ -8,7 +8,7 @@ if __name__ == "__main__":
         'search_req': "Салон красоты",
         'city': "Москва"
     }
-
+    print()
     parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'])
     parsing_data = list(
         map(
@@ -28,4 +28,5 @@ if __name__ == "__main__":
                     d.get('phone_number'),
                     d.get('tags')),parsing_data))
     for data in parsing_data:
+        print(data)
         print(len(data))

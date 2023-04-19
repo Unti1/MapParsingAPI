@@ -24,6 +24,7 @@ if __name__ == "__main__":
         db.insert_data(dat)
         db.test_working()
     except:
+        logging.error(traceback.format_exc())
         print("Ошибка")   
 
     print("Обновление данных...")
@@ -47,6 +48,7 @@ if __name__ == "__main__":
         db.update_data(upt_dat)
         db.test_working()
     except:
+        logging.error(traceback.format_exc())
         print("Ошибка")
         
     print("Обновление данных...")
@@ -70,6 +72,7 @@ if __name__ == "__main__":
         db.update_data(upt_dat)
         db.test_working()
     except:
+        logging.error(traceback.format_exc())
         print("Ошибка")
         
     db._del_tab()
