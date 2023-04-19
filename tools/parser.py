@@ -11,7 +11,7 @@ class Parser():#Thread):
             Для Linux сделать предвартилеьно chmo+x ..utils/cromedriver-linux
         """
         self.browser_startUp(profile_id,invisable = invisable)
-        self.wait = WebDriverWait(self.driver,15)
+        self.wait = WebDriverWait(self.driver,float(config['Selenium']['wait_time']))
         self.action = ActionChains(self.driver,1.25)
         
     def browser_startUp(self, PROFILE_ID,invisable):
