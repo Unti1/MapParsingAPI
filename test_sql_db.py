@@ -4,6 +4,11 @@ from settings import *
 
 if __name__ == "__main__":
     db = SQL_DB()
+    try:
+        db._del_tab()
+    except:
+        pass
+    
     print("Добавление элемента:")
     try:
         dat = ("image1", 
