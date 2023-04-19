@@ -88,6 +88,7 @@ class Parser():#Thread):
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@class='input__control _bold']")))
         inp = self.driver.find_element(By.XPATH,"//input[@class='input__control _bold']")
         inp.send_keys(f"{search_req} в городе {city}")
+        time.sleep(3)
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='popup _type_transparent _position_bottom _dropdown']")))
         inp.send_keys(Keys.ENTER)
         self.wait.until(EC.element_to_be_clickable((By.XPATH,'//div[@data-object="search-list-item"]')))
