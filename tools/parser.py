@@ -131,7 +131,7 @@ class Parser():#Thread):
         for ad_element in self.driver.find_elements(By.XPATH,"//a[@class='search-snippet-view__link-overlay _focusable']"):
             link = ad_element.get_attribute("href")
             ads_links.append(f"{link}")
-        self.ya_company_parsing(ads_links)
+        return(self.ya_company_parsing(ads_links))
 
     def try_closing(self):
         self.driver.close()
