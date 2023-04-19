@@ -12,7 +12,7 @@ class Parser():#Thread):
         """
         self.browser_startUp(profile_id,invisable = invisable)
         self.wait = WebDriverWait(self.driver,15)
-        self.action = ActionChains(self.driver,1)
+        self.action = ActionChains(self.driver,1.25)
         
     def browser_startUp(self, PROFILE_ID,invisable):
         """Создание настройка и создания эмуляции браузера
@@ -84,11 +84,14 @@ class Parser():#Thread):
         """
         import time
         self.driver.get("https://yandex.ru/maps")
-        time.sleep(1.5)
+        time.sleep(2.5)
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@class='input__control _bold']")))
         inp = self.driver.find_element(By.XPATH,"//input[@class='input__control _bold']")
-        inp.send_keys(f"{search_req} в городе {city}")
-        time.sleep(3)
+        time.sleep(2.5)
+        inp.click()
+        time.sleep(2.5)
+        self.action.send_keys(f"{search_req} в городе {city}").perform()
+        time.sleep(2.5)
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='popup _type_transparent _position_bottom _dropdown']")))
         inp.send_keys(Keys.ENTER)
         self.wait.until(EC.element_to_be_clickable((By.XPATH,'//div[@data-object="search-list-item"]')))
@@ -163,6 +166,7 @@ class Parser():#Thread):
             title = self.driver.find_element(By.XPATH,'//*[@class="orgpage-header-view__header"]').text
         # Рейтинг(!!! единственный тип данных не str для переноса в БД)
         stars = float(self.driver.find_element(By.XPATH,'//div[@class="business-rating-badge-view__rating"]/span[2]').text.replace(",","."))
+        
         # Данные из поделиться БОЛЬШЕ НЕТУ КНОПКИ
         # self.driver.find_element(By.XPATH,'//button[@aria-label="Поделиться"]').click()
         # self.wait.until(EC.element_to_be_clickable((By.XPATH,'//div[@class="card-share-view"]//div[@class="card-feature-view__content"][1]')))
@@ -191,9 +195,12 @@ class Parser():#Thread):
             company_site = "None"
         
         # График работы
-        self.driver.find_element(By.XPATH,'//*[@class="business-card-working-status-view__main"]').click()
-        working_time = list(map(lambda x: x.text, self.driver.find_elements(By.XPATH,'//*[@class="business-working-intervals-view__item"]')))
-        working_time = '; '.join(working_time)
+        try:
+            self.driver.find_element(By.XPATH,'//*[@class="business-card-working-status-view__main"]').click()
+            working_time = list(map(lambda x: x.text, self.driver.find_elements(By.XPATH,'//*[@class="business-working-intervals-view__item"]')))
+            working_time = '; '.join(working_time)
+        except:
+            working_time = "Временно закрыты или не работет"
         # Соц сети
         try: 
             socials = list(map(lambda x: x.get_attribute('href'),self.driver.find_elements(By.XPATH,'//*[@class="business-contacts-view__social-button"]/a')))
