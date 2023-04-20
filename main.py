@@ -32,7 +32,7 @@ def update_data():
                        d.get('city'),
                        d.get('stars'),
                        d.get('reviews'),
-                       d.get('description'),
+                       d.get('descriptions'),
                        d.get('working_time'),
                        d.get('socials'),
                        d.get('company_site'),

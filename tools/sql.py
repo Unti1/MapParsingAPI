@@ -89,8 +89,8 @@ class SQL_DB:
         old_records = []
 
         for record in all_records:
-            record_date = datetime.strptime(record[-1], '%Y-%m-%d %H:%M:%S')
-            difference = datetime.now() - record_date
+            record_date = datetime.datetime.strptime(record[-1], '%Y-%m-%d %H:%M:%S')
+            difference = datetime.datetime.now() - record_date
             if difference.days > 7:
                 old_records.append(record)
 
