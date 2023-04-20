@@ -250,6 +250,7 @@ class Parser():#Thread):
         try: 
             tags = list(map(lambda x: x.text,self.driver.find_elements(By.XPATH,"//div[@class='features-cut-view']")))
             tags = "; ".join(tags)
+            tags = tags.replace("\n","; ")
         except:
             tags = 'None'
         

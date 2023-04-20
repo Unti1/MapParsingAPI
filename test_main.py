@@ -1,6 +1,8 @@
 from settings import *
 from tools import *
 
+
+
 app = Flask(__name__)
 db = SQL_DB()
 p = Parser(config['Selenium']['profile_id'])
@@ -20,7 +22,7 @@ def update_data():
     data = request.json
     # тут должно выполнятся приложение
     if 'search_req' in data.keys() and 'city' in data.keys():
-        parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'])
+        parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'],limit = 5 )
         parsing_data = list(
             map(
             lambda d: (d.get('photos'), # для поля images
@@ -40,7 +42,7 @@ def update_data():
                        d.get('tags')),parsing_data))
         for data in parsing_data:
             db.insert_data(data)
-        db.test_working()
+        db.test_working() # выводим то что в бд в терминал
         return jsonify({"status": "success", "message": "Data updated."})
     else:
         return jsonify({"status": "error", "message": "You are loss 'search_req' or 'city' in put your data"})
