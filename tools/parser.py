@@ -78,7 +78,7 @@ class Parser():#Thread):
         self.driver.get("https://yandex.ru/maps")
         time.sleep(1.5)
         
-    def ya_map(self,search_req:str,city:str):
+    def ya_map(self,search_req:str,city:str,limit = int(config['Yandex']['total_count'])):
         """
         Сбор конкретно объявлений
         """
@@ -88,9 +88,8 @@ class Parser():#Thread):
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@class='input__control _bold']")))
         inp = self.driver.find_element(By.XPATH,"//input[@class='input__control _bold']")
         inp.click()
-        search_req = search_req.replace(" ","_")
-        city = city.replace(" ","_")
-        self.action.send_keys(f"{search_req}_в_городе_{city}").perform()
+        req = f"{search_req} в городе {city}".replace(" ","_")
+        self.action.send_keys(req).perform()
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='popup _type_transparent _position_bottom _dropdown']")))
         inp.send_keys(Keys.ENTER)
         self.wait.until(EC.element_to_be_clickable((By.XPATH,'//div[@data-object="search-list-item"]')))
@@ -126,11 +125,11 @@ class Parser():#Thread):
             """
         self.driver.execute_script(js_cursor)# курсор в браузере для тестирования*
 
-        self._ya_scroll("//li[@class='search-snippet-view']")
+        self._ya_scroll("//li[@class='search-snippet-view']",limit = limit)
         # Получение списка всех объявлений на странице
         
         ads_links = []
-        for ad_element in self.driver.find_elements(By.XPATH,"//a[@class='search-snippet-view__link-overlay _focusable']"):
+        for ad_element in self.driver.find_elements(By.XPATH,"//a[@class='search-snippet-view__link-overlay _focusable']")[:limit]:
             link = ad_element.get_attribute("href")
             ads_links.append(f"{link}")
         return(self.ya_company_parsing(ads_links))
@@ -142,7 +141,8 @@ class Parser():#Thread):
         parse_data = []
         for link in links:
             data = self.collecting_company_card(link)
-        parse_data.append(data) if data != None else None
+            parse_data.append(data) if data != None else None
+        parse_data = list(filter(lambda d: d != None, parse_data))
         return(parse_data)
 
     def collecting_company_card(self,link):
@@ -164,8 +164,10 @@ class Parser():#Thread):
         except:
             title = self.driver.find_element(By.XPATH,'//*[@class="orgpage-header-view__header"]').text
         # Рейтинг(!!! единственный тип данных не str для переноса в БД)
-        stars = float(self.driver.find_element(By.XPATH,'//div[@class="business-rating-badge-view__rating"]/span[2]').text.replace(",","."))
-        
+        try:
+            stars = float(self.driver.find_element(By.XPATH,'//div[@class="business-rating-badge-view__rating"]/span[2]').text.replace(",","."))
+        except:
+            stars = 0
         # Данные из поделиться БОЛЬШЕ НЕТУ КНОПКИ
         # self.driver.find_element(By.XPATH,'//button[@aria-label="Поделиться"]').click()
         # self.wait.until(EC.element_to_be_clickable((By.XPATH,'//div[@class="card-share-view"]//div[@class="card-feature-view__content"][1]')))
@@ -175,6 +177,7 @@ class Parser():#Thread):
 
         share_link = self.driver.current_url
         coords = self.driver.current_url.split('/')[-1]
+
         # Адрес и город
         try:
             address = self.driver.find_element(By.XPATH,'//*[@class="orgpage-header-view__address"]//span[1]').text
@@ -182,11 +185,13 @@ class Parser():#Thread):
         except:
             address = "None"
             city = "None"
+
         # Номер телефона
         try:
             phone_number = self.driver.find_element(By.XPATH,'//span[@itemprop="telephone"]').text
         except:
             phone_number = "None"
+
         # Сайт компании
         try:
             company_site = self.driver.find_element(By.XPATH,'//*[@class="business-urls-view__text"]').text
@@ -200,6 +205,7 @@ class Parser():#Thread):
             working_time = '; '.join(working_time)
         except:
             working_time = "Временно закрыты или не работет"
+
         # Соц сети
         try: 
             socials = list(map(lambda x: x.get_attribute('href'),self.driver.find_elements(By.XPATH,'//*[@class="business-contacts-view__social-button"]/a')))
@@ -218,11 +224,20 @@ class Parser():#Thread):
             photos = 'None'
 
         try:
+            try:
+                more_but = self.driver.find_elements(By.XPATH,'//span[@class="business-review-view__expand"]')
+                for but in more_but:
+                    but.click()
+            except:
+                pass
+
+            reviews_locator = '//div[@class="business-review-view__info"]'
             self.driver.get(f'{new_link[:new_link.rfind("/")]}/reviews{new_link[new_link.rfind("/"):]}')
-            self.wait.until(EC.element_to_be_clickable((By.XPATH,'//*[@class="business-review-view"]//div[@class="business-review-view__body"]')))
-            self._ya_scroll('//*[@class="business-review-view"]//div[@class="business-review-view__body"]',10)
-            reviews = list(map(lambda x: x.text ,self.driver.find_elements(By.XPATH,'//*[@class="business-review-view"]//div[@class="business-review-view__body"]')))[:10]
+            self.wait.until(EC.element_to_be_clickable((By.XPATH,reviews_locator)))
+            self._ya_scroll(reviews_locator,10)
+            reviews = list(map(lambda x: x.text ,self.driver.find_elements(By.XPATH,reviews_locator)))[:10]
             reviews = '; '.join(reviews)
+        
         except:
             reviews = 'None'
         
@@ -236,7 +251,8 @@ class Parser():#Thread):
             tags = list(map(lambda x: x.text,self.driver.find_elements(By.XPATH,"//div[@class='features-cut-view']")))
             tags = "; ".join(tags)
         except:
-            tags = None
+            tags = 'None'
+        
         final_data = {
             "title":title,
             "stars":stars,

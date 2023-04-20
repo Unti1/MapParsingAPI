@@ -9,7 +9,7 @@ if __name__ == "__main__":
         'city': "Москва"
     }
     print(data['search_req'],data['city'])
-    parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'])
+    parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'],limit=5)
     parsing_data = list(
         map(
         lambda d: (d.get('photos'), # для поля images
