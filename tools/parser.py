@@ -91,6 +91,7 @@ class Parser():#Thread):
         req = f"{search_req} в городе {city}".replace(" ","_")
         self.action.send_keys(req).perform()
         self.wait.until(EC.element_to_be_clickable((By.XPATH,"//div[@class='popup _type_transparent _position_bottom _dropdown']")))
+        time.sleep(2.5)
         inp.send_keys(Keys.ENTER)
         self.wait.until(EC.element_to_be_clickable((By.XPATH,'//div[@data-object="search-list-item"]')))
         
