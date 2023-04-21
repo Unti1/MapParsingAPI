@@ -144,7 +144,15 @@ class Parser():#Thread):
             parse_data.append(data) if data != None else None
         parse_data = list(filter(lambda d: d != None, parse_data))
         return(parse_data)
-
+    
+    def review_associativing(self,data):
+        data:str = data.text
+        if len(data.split("\n")[0]) == 1: 
+            data = data.split('\n',maxsplit=4)[1:]
+        else: 
+            data = data.split('\n',maxsplit=3)
+        return(data)
+    
     def collecting_company_card(self,link):
         """
         Функция по сбору данных с одной карточки
@@ -175,55 +183,55 @@ class Parser():#Thread):
         try:
             category = self.driver.find_element(By.XPATH,"//div[@class='business-card-title-view__categories']").text
             if ',' in category:
-                category = category.split(",")
+                category = str(category.split(","))
         except:
             category = "NULL"
-            
+
         # Адрес и город
         try:
             address = self.driver.find_element(By.XPATH,'//*[@class="orgpage-header-view__address"]//span[1]').text
             city = address.split(',')[-1]
         except:
-            address = "None"
-            city = "None"
+            address = "NULL"
+            city = "NULL"
 
         # Номер телефона
         try:
             phone_number = self.driver.find_element(By.XPATH,'//span[@itemprop="telephone"]').text
         except:
-            phone_number = "None"
+            phone_number = "NULL"
 
         # Сайт компании
         try:
             company_site = self.driver.find_element(By.XPATH,'//*[@class="business-urls-view__text"]').text
         except:
-            company_site = "None"
+            company_site = "NULL"
         
         # График работы
         try:
 
             self.driver.find_element(By.XPATH,'//*[@class="business-card-working-status-view__main"]').click()
-            working_time = list(map(lambda x: x.text, self.driver.find_elements(By.XPATH,'//*[@class="business-working-intervals-view__item"]')))
-            working_time = '; '.join(working_time)
+            working_time = list(map(lambda x: x.text.replace("\n"," | "), self.driver.find_elements(By.XPATH,'//*[@class="business-working-intervals-view__item"]')))
+            working_time = str(working_time)
         except:
-            working_time = "Временно закрыты или не работет"
+            working_time = "NULL"
 
         # Соц сети
         try: 
             socials = list(map(lambda x: x.get_attribute('href'),self.driver.find_elements(By.XPATH,'//*[@class="business-contacts-view__social-button"]/a')))
-            socials = '; '.join(socials)
+            socials = str(socials)
         except:
-            socials = "None"
+            socials = "NULL"
 
         try:
             self.driver.get(f'{new_link[:new_link.rfind("/")]}/gallery{new_link[new_link.rfind("/"):]}')
             self.wait.until(EC.element_to_be_clickable((By.XPATH,'//img')))
             self._ya_scroll('//img',1000)
             photos = list(map(lambda x: x.get_attribute('src') ,self.driver.find_elements(By.XPATH,"//img")))
-            photos = list(filter(lambda x: "yastatic" not in x,photos))
-            photos = '; '.join(photos)
+            photos = list(filter(lambda x: "avatars" in x,photos))
+            photos = str(photos)
         except:
-            photos = 'None'
+            photos = 'NULL'
 
         try:
             try:
@@ -237,23 +245,27 @@ class Parser():#Thread):
             self.driver.get(f'{new_link[:new_link.rfind("/")]}/reviews{new_link[new_link.rfind("/"):]}')
             self.wait.until(EC.element_to_be_clickable((By.XPATH,reviews_locator)))
             self._ya_scroll(reviews_locator,10)
-            reviews = list(map(lambda x: x.text ,self.driver.find_elements(By.XPATH,reviews_locator)))[:10]
-            reviews = '; '.join(reviews)
+            reviews = list(map(lambda x: self.review_associativing(x) ,self.driver.find_elements(By.XPATH,reviews_locator)))[:10]
+            reviews = str(reviews)
         except:
-            reviews = 'None'
+            reviews = 'NULL'
         
         try:
             self.driver.get(f'{new_link[:new_link.rfind("/")]}/features{new_link[new_link.rfind("/"):]}')
             descriptions = self.driver.find_element(By.XPATH,'//div[@class="business-features-view__valued-list"]').text
         except:
-            descriptions = 'None'
+            descriptions = 'NULL'
         
-        try: 
-            tags = list(map(lambda x: x.text,self.driver.find_elements(By.XPATH,"//div[@class='features-cut-view']")))
-            tags = "; ".join(tags)
-            tags = tags.replace("\n","; ")
+        try:
+            try: 
+                tags = list(map(lambda x: x.text,self.driver.find_elements(By.XPATH,"//div[@class='orgpage-categories-info-view']")))
+                tags = str(tags)
+            except:
+                tags = list(map(lambda x: x.text,self.driver.find_elements(By.XPATH,"//div[@class='features-cut-view']")))
+                tags = "; ".join(tags)
+                tags = tags.replace("\n","; ")
         except:
-            tags = 'None'
+            tags = 'NULL'
         
         final_data = {
             "title":title,
