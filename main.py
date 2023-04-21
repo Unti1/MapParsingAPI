@@ -20,7 +20,12 @@ def update_data():
     data = request.json
     # тут должно выполнятся приложение
     if 'search_req' in data.keys() and 'city' in data.keys():
-        parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'])
+        
+        if 'limit' in data.keys():
+            parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'],data['limit'])
+        else:
+            parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'])
+        
         parsing_data = list(
             map(
             lambda d: (d.get('photos'), # для поля images

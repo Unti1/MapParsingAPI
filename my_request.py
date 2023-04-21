@@ -4,8 +4,8 @@ url = "http://5.181.252.113:5000/parse_companies"
 
 # Замените значения на свои данные для запроса
 data = {
-    "search_req": "Магазин продуктов",
-    "city": "Санкт-Петербург"
+    "search_req": "Магазин игрушек",
+    "city": "Москва"
 }
 
 response = requests.put(url, json=data)
