@@ -168,16 +168,17 @@ class Parser():#Thread):
             stars = float(self.driver.find_element(By.XPATH,'//div[@class="business-rating-badge-view__rating"]/span[2]').text.replace(",","."))
         except:
             stars = 0
-        # Данные из поделиться БОЛЬШЕ НЕТУ КНОПКИ
-        # self.driver.find_element(By.XPATH,'//button[@aria-label="Поделиться"]').click()
-        # self.wait.until(EC.element_to_be_clickable((By.XPATH,'//div[@class="card-share-view"]//div[@class="card-feature-view__content"][1]')))
-        # share_content = self.driver.find_elements(By.XPATH,'//div[@class="card-share-view"]//div[@class="card-feature-view__content"]')
-        # share_link = share_content[1].text
-        # coords = share_content[2].text
 
         share_link = self.driver.current_url
         coords = self.driver.current_url.split('/')[-1]
 
+        try:
+            category = self.driver.find_element(By.XPATH,"//div[@class='business-card-title-view__categories']").text
+            if ',' in category:
+                category = category.split(",")
+        except:
+            category = "NULL"
+            
         # Адрес и город
         try:
             address = self.driver.find_element(By.XPATH,'//*[@class="orgpage-header-view__address"]//span[1]').text
@@ -200,6 +201,7 @@ class Parser():#Thread):
         
         # График работы
         try:
+
             self.driver.find_element(By.XPATH,'//*[@class="business-card-working-status-view__main"]').click()
             working_time = list(map(lambda x: x.text, self.driver.find_elements(By.XPATH,'//*[@class="business-working-intervals-view__item"]')))
             working_time = '; '.join(working_time)
@@ -237,7 +239,6 @@ class Parser():#Thread):
             self._ya_scroll(reviews_locator,10)
             reviews = list(map(lambda x: x.text ,self.driver.find_elements(By.XPATH,reviews_locator)))[:10]
             reviews = '; '.join(reviews)
-        
         except:
             reviews = 'None'
         
