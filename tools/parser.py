@@ -12,8 +12,46 @@ class Parser():#Thread):
         """
         self.browser_startUp(profile_id,invisable = invisable)
         self.wait = WebDriverWait(self.driver,float(config['Selenium']['wait_time']))
-        self.action = ActionChains(self.driver,1.25)
-        
+        self.action = ActionChains(self.driver,400)
+        self.js_cursor = """
+    var cursor = document.createElement('div');
+    cursor.id = 'custom_cursor';
+    cursor.style.position = 'absolute';
+    cursor.style.zIndex = '9999';
+    cursor.style.pointerEvents = 'none';
+    cursor.style.width = '10px';
+    cursor.style.height = '10px';
+    cursor.style.border = '2px solid black';
+    cursor.style.borderRadius = '50%';
+    cursor.style.backgroundColor = 'red';
+    document.body.appendChild(cursor);
+
+    document.addEventListener('mousemove', function(e) {
+        cursor.style.left = (e.pageX - 5) + 'px';
+        cursor.style.top = (e.pageY - 5) + 'px';
+    });
+
+    function splash() {
+        var splashElem = cursor.cloneNode();
+        splashElem.style.border = '2px solid transparent';
+        splashElem.style.transition = 'width 0.5s, height 0.5s, border 0.5s, opacity 0.5s';
+        splashElem.style.width = '30px';
+        splashElem.style.height = '30px';
+        splashElem.style.opacity = '0';
+        document.body.appendChild(splashElem);
+
+        setTimeout(function() {
+            document.body.removeChild(splashElem);
+        }, 500);
+    }
+
+    document.addEventListener('click', function(e) {
+        cursor.style.left = (e.pageX - 15) + 'px';
+        cursor.style.top = (e.pageY - 15) + 'px';
+        splash();
+    });
+"""
+      
     def browser_startUp(self, PROFILE_ID,invisable):
         """Создание настройка и создания эмуляции браузера
         """ 
@@ -146,14 +184,40 @@ class Parser():#Thread):
         parse_data = list(filter(lambda d: d != None, parse_data))
         return(parse_data)
     
-    def review_associativing(self,data):
+    def review_associativing(self,data,num:int):
+        if "\nещё" in data.text:
+            text = data.find_elements(By.XPATH,f"//span[@class='business-review-view__body-text']")[self.num].text
+            self.num += 1
+        else:
+            if len(data.text.split("\n")[0]) == 1: 
+                text = data.text.split('\n',maxsplit=4)[4]
+            else: 
+                text = data.text.split('\n',maxsplit=3)[3]
+        
         data:str = data.text
+        dct_data = {'author':None,'status':None,'date':None,'text':None,'company_answer':None}
+        
         if len(data.split("\n")[0]) == 1: 
             data = data.split('\n',maxsplit=4)[1:]
         else: 
             data = data.split('\n',maxsplit=3)
-        return(data)
-    
+        try:
+            c = 0
+            if len(data) == 4:
+                values = [data[0],data[1],data[2],text,"NULL"]
+                for key in dct_data:
+                    dct_data[key] = values[c]
+                    c += 1
+            else:
+                values = [data[0],data[1],data[2],text,data[4]]
+                for key in dct_data:
+                    dct_data[key] = values[c]
+                    c += 1
+            format_text = json.dumps(dct_data,ensure_ascii=False)
+            return(format_text)
+        except:
+            logging.info(traceback.format_exc())
+
     def collecting_company_card(self,link):
         """
         Функция по сбору данных с одной карточки
@@ -186,27 +250,27 @@ class Parser():#Thread):
             if ',' in category:
                 category = str(category.split(","))
         except:
-            category = "NULL"
+            category = None
 
         # Адрес и город
         try:
             address = self.driver.find_element(By.XPATH,'//*[@class="orgpage-header-view__address"]//span[1]').text
             city = address.split(',')[-1]
         except:
-            address = "NULL"
-            city = "NULL"
+            address = None
+            city = None
 
         # Номер телефона
         try:
             phone_number = self.driver.find_element(By.XPATH,'//span[@itemprop="telephone"]').text
         except:
-            phone_number = "NULL"
+            phone_number = None
 
         # Сайт компании
         try:
             company_site = self.driver.find_element(By.XPATH,'//*[@class="business-urls-view__text"]').text
         except:
-            company_site = "NULL"
+            company_site = None
         
         # График работы
         try:
@@ -215,14 +279,14 @@ class Parser():#Thread):
             working_time = list(map(lambda x: x.text.replace("\n"," | "), self.driver.find_elements(By.XPATH,'//*[@class="business-working-intervals-view__item"]')))
             working_time = str(working_time)
         except:
-            working_time = "NULL"
+            working_time = None
 
         # Соц сети
         try: 
             socials = list(map(lambda x: x.get_attribute('href'),self.driver.find_elements(By.XPATH,'//*[@class="business-contacts-view__social-button"]/a')))
             socials = str(socials)
         except:
-            socials = "NULL"
+            socials = None
 
         try:
             self.driver.get(f'{new_link[:new_link.rfind("/")]}/gallery{new_link[new_link.rfind("/"):]}')
@@ -232,30 +296,30 @@ class Parser():#Thread):
             photos = list(filter(lambda x: "avatars" in x,photos))
             photos = str(photos)
         except:
-            photos = 'NULL'
+            photos = None
 
         try:
-            try:
-                more_but = self.driver.find_elements(By.XPATH,'//span[@class="business-review-view__expand"]')
-                for but in more_but:
-                    but.click()
-            except:
-                pass
-
+            self.num = 1
             reviews_locator = '//div[@class="business-review-view__info"]'
             self.driver.get(f'{new_link[:new_link.rfind("/")]}/reviews{new_link[new_link.rfind("/"):]}')
+            time.sleep(2.5)
             self.wait.until(EC.element_to_be_clickable((By.XPATH,reviews_locator)))
             self._ya_scroll(reviews_locator,10)
-            reviews = list(map(lambda x: self.review_associativing(x) ,self.driver.find_elements(By.XPATH,reviews_locator)))[:10]
-            reviews = str(reviews)
+            lst = []
+            reviews_el = self.driver.find_elements(By.XPATH,reviews_locator)[:10]
+            for num in range(len(reviews_el)):
+                lst.append(self.review_associativing(reviews_el[num],num))
+            # reviews = list(map(lambda x: self.review_associativing(x) ,self.driver.find_elements(By.XPATH,reviews_locator)))[:10]
+            reviews = str(lst)
         except:
-            reviews = 'NULL'
+            logging.info(traceback.format_exc())
+            reviews = None
         
         try:
             self.driver.get(f'{new_link[:new_link.rfind("/")]}/features{new_link[new_link.rfind("/"):]}')
             descriptions = self.driver.find_element(By.XPATH,'//div[@class="business-features-view__valued-list"]').text
         except:
-            descriptions = 'NULL'
+            descriptions = None
         
         try:
             try: 
@@ -266,7 +330,7 @@ class Parser():#Thread):
                 tags = "; ".join(tags)
                 tags = tags.replace("\n","; ")
         except:
-            tags = 'NULL'
+            tags = None
         
         final_data = {
             "title":title,
@@ -283,6 +347,7 @@ class Parser():#Thread):
             "socials":socials,
             "photos":photos,
             "reviews":reviews,
-            "tags":tags
+            "tags":tags,
+            "category": category
         }
         return(final_data)
