@@ -22,7 +22,7 @@ def update_data():
     if 'search_req' in data.keys() and 'city' in data.keys():
         
         if 'limit' in data.keys():
-            parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'],data['limit'])
+            parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'],int(data['limit']))
         else:
             parsing_data:list[dict] = p.ya_map(data['search_req'],data['city'])
         
