@@ -190,13 +190,13 @@ class Parser():#Thread):
             self.num += 1
         else:
             if len(data.text.split("\n")[0]) == 1: 
-                text = data.text.split('\n',maxsplit=4)[4]
+                text:str = data.text.split('\n',maxsplit=4)[4]
             else: 
-                text = data.text.split('\n',maxsplit=3)[3]
+                text:str = data.text.split('\n',maxsplit=3)[3]
         
         data:str = data.text
         dct_data = {'author':None,'status':None,'date':None,'text':None,'company_answer':None}
-        
+        text = text.replace("Посмотреть ответ организации","")
         if len(data.split("\n")[0]) == 1: 
             data = data.split('\n',maxsplit=4)[1:]
         else: 
@@ -324,6 +324,7 @@ class Parser():#Thread):
         try:
             try: 
                 tags = list(map(lambda x: x.text,self.driver.find_elements(By.XPATH,"//div[@class='orgpage-categories-info-view']")))
+                tags = tags[0].split('\n')
                 tags = str(tags)
             except:
                 tags = list(map(lambda x: x.text,self.driver.find_elements(By.XPATH,"//div[@class='features-cut-view']")))
