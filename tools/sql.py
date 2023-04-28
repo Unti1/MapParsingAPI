@@ -142,7 +142,8 @@ class SQL_DB:
             
             cursor.execute("SELECT * FROM companies")
             data = cursor.fetchall()
-            print(data)
+            # print(data)
+            return(data)
         
     def delete_data(self, id):
         cursor = self.connection.cursor()

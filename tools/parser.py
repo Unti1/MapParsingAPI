@@ -201,6 +201,7 @@ class Parser():#Thread):
             data = data.split('\n',maxsplit=4)[1:]
         else: 
             data = data.split('\n',maxsplit=3)
+        
         try:
             c = 0
             if len(data) == 4:
@@ -286,8 +287,8 @@ class Parser():#Thread):
             socials = list(map(lambda x: x.get_attribute('href'),self.driver.find_elements(By.XPATH,'//*[@class="business-contacts-view__social-button"]/a')))
             socials = str(socials)
         except:
-            socials = None
 
+            socials = None
         try:
             self.driver.get(f'{new_link[:new_link.rfind("/")]}/gallery{new_link[new_link.rfind("/"):]}')
             self.wait.until(EC.element_to_be_clickable((By.XPATH,'//img')))
