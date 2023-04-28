@@ -325,12 +325,12 @@ class Parser():#Thread):
         try:
             try: 
                 tags = list(map(lambda x: x.text,self.driver.find_elements(By.XPATH,"//div[@class='orgpage-categories-info-view']")))
-                tags = tags[0].split('\n')
+                if tags[0].find("\n") != -1:
+                    tags = tags[0].split('\n')
                 tags = str(tags)
             except:
                 tags = list(map(lambda x: x.text,self.driver.find_elements(By.XPATH,"//div[@class='features-cut-view']")))
-                tags = "; ".join(tags)
-                tags = tags.replace("\n","; ")
+                tags = str(tags)
         except:
             tags = None
         
